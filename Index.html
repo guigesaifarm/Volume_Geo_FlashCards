@@ -1,1 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards Interativos: Educação Inclusiva</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary-color: #2c3e50;
+            --accent-color: #8e44ad;
+            --text-color: #333333;
+            --text-muted: #7f8c8d;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .tracker {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        /* Flashcard Container */
+        .scene {
+            width: 100%;
+            max-width: 600px;
+            height: 380px;
+            perspective: 1000px;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .card-face-front {
+            background: #ffffff;
+        }
+
+        .card-face-back {
+            background: #fdfaf7;
+            transform: rotateY(180deg);
+            border-left: 6px solid var(--accent-color);
+        }
+
+        .card-category {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .card-content {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: var(--primary-color);
+            font-weight: 500;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .card-face-back .card-content {
+            font-size: 0.95rem;
+            text-align: left;
+            color: #34495e;
+        }
+
+        .card-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .card-image {
+            width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 5px auto;
+            display: block;
+            border: 1px solid #e1e8ed;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            border: 1px solid #dcdfe6;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .scene {
+                height: 420px;
+            }
+            .card-content {
+                font-size: 1.05rem;
+            }
+            .card-face-back .card-content {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Flashcards Interativos</h1>
+        <p>Educação Inclusiva & Marcos Legais</p>
+    </header>
+
+    <div class="tracker" id="card-tracker">Card 1 de 10</div>
+
+    <div class="scene" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <div class="card-face card-face-front">
+                <div class="card-category" id="card-category">Declaração de Salamanca</div>
+                <img class="card-image" id="card-image-front" src="imagem1_front.jpeg" alt="Imagem Frontal">
+                <div class="card-content" id="card-front">Carregando...</div>
+                <div class="card-hint">💡 Clique para ver a resposta</div>
+            </div>
+            <div class="card-face card-face-back">
+                <div class="card-category">Resposta</div>
+                <img class="card-image" id="card-image-back" src="imagem1_back.jpeg" alt="Imagem Traseira">
+                <div class="card-content" id="card-back">Carregando...</div>
+                <div class="card-hint">💡 Clique para virar novamente</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevCard()">Anterior</button>
+        <button onclick="flipCard()">Virar Card</button>
+        <button onclick="nextCard()">Próximo</button>
+    </div>
+
+    <script>
+        const cardsData = [
+            {
+                category: "Declaração de Salamanca (1994)",
+                imageFront: "imagem1_front.jpeg",
+                imageBack: "imagem1_back.jpeg",
+                front: "Qual é o princípio basilar estabelecido pela Declaração de Salamanca em relação à educação?",
+                back: "Estabelece que todas as crianças têm o direito fundamental à educação e que as <b>escolas regulares inclusivas</b> são os meios mais eficazes para combater a discriminação, construir uma sociedade inclusiva e alcançar a educação para todos."
+            },
+            {
+                category: "Integração vs. Inclusão",
+                imageFront: "imagem2_front.jpeg",
+                imageBack: "imagem2_back.jpeg",
+                front: "Qual a diferença conceitual entre 'Integração' e 'Inclusão' escolar?",
+                back: "<b>Integração:</b> O aluno deve se adaptar à estrutura e às exigências da escola tradicional.<br><br><b>Inclusão:</b> O sistema de ensino e a escola se transformam para eliminar barreiras e acolher a diversidade de todos os estudantes."
+            },
+            {
+                category: "Público-Alvo da Educação Especial (PAEE)",
+                imageFront: "imagem3_front.jpeg",
+                imageBack: "imagem3_back.jpeg",
+                front: "Segundo as diretrizes nacionais vigentes, quem compõe o Público-Alvo da Educação Especial?",
+                back: "1. Estudantes com <b>Deficiência</b> (física, intelectual, auditiva, visual ou múltipla).<br>2. Estudantes com <b>Transtornos Globais do Desenvolvimento (TEA)</b>.<br>3. Estudantes com <b>Altas Habilidades / Superdotação</b>."
+            },
+            {
+                category: "Atendimento Educacional Especializado (AEE)",
+                imageFront: "imagem4_front.jpeg",
+                imageBack: "imagem4_back.jpeg",
+                front: "O que é o AEE e em qual modalidade ele deve ser ofertado?",
+                back: "É um serviço da educação especial que identifica, elabora e organiza recursos pedagógicos e de acessibilidade. Deve ser oferecido de forma <b>complementar ou suplementar</b> ao ensino regular, preferencialmente no <b>contraturno</b> (turno inverso)."
+            },
+            {
+                category: "Lei Brasileira de Inclusão (LBI)",
+                imageFront: "imagem5_front.jpeg",
+                imageBack: "imagem5_back.jpeg",
+                front: "O que a LBI (Lei nº 13.146/2015) determina sobre cobranças em instituições privadas de ensino?",
+                back: "A LBI proíbe expressamente as escolas privadas de cobrarem <b>qualquer valor adicional ou taxa extra</b> nas mensalidades/anuidades para ofertar recursos de acessibilidade, adaptações ou profissionais de apoio."
+            },
+            {
+                category: "Plano de Desenvolvimento Individualizado (PDI/PEI)",
+                imageFront: "imagem6_front.jpeg",
+                imageBack: "imagem6_back.jpeg",
+                front: "Qual a finalidade do PDI / PEI no contexto da Educação Inclusiva?",
+                back: "É um instrumento pedagógico de planejamento que mapeia as potencialidades, necessidades e objetivos de aprendizagem do estudante com deficiência, registrando as <b>flexibilizações curriculares e recursos de acessibilidade</b> necessários."
+            },
+            {
+                category: "Desenho Universal para a Aprendizagem (DUA)",
+                imageFront: "imagem7_front.jpeg",
+                imageBack: "imagem7_back.jpeg",
+                front: "Quais são os 3 pilares fundamentais do Desenho Universal para a Aprendizagem (DUA)?",
+                back: "1. Múltiplos meios de <b>Engajamento</b> (o 'porquê' da aprendizagem).<br>2. Múltiplos meios de <b>Representação</b> (o 'o que' aprender).<br>3. Múltiplos meios de <b>Ação e Expressão</b> (o 'como' aprender)."
+            },
+            {
+                category: "Sala de Recursos Multifuncionais (SRM)",
+                imageFront: "imagem8_front.jpeg",
+                imageBack: "imagem8_back.jpeg",
+                front: "O que é a Sala de Recursos Multifuncionais (SRM)?",
+                back: "É um espaço físico localizado na escola comum, dotado de equipamentos, móveis, materiais didáticos e recursos de <b>Tecnologia Assistiva</b> para a realização do Atendimento Educacional Especializado (AEE)."
+            },
+            {
+                category: "Tecnologia Assistiva (TA)",
+                imageFront: "imagem9_front.jpeg",
+                imageBack: "imagem9_back.jpeg",
+                front: "Qual o objetivo principal da Tecnologia Assistiva (TA) na educação?",
+                back: "Promover a <b>funcionalidade, autonomia, comunicação e participação</b> de estudantes com deficiência ou mobilidade reduzida, eliminando barreiras no processo de ensino e aprendizagem."
+            },
+            {
+                category: "Amparo na LDB (Art. 58 e 59)",
+                imageFront: "imagem10_front.jpeg",
+                imageBack: "imagem10_back.jpeg",
+                front: "O que a LDB (Lei nº 9.394/96) estabelece sobre o local de oferta da Educação Especial?",
+                back: "Determina que a Educação Especial deve ser oferecida <b>preferencialmente na rede regular de ensino</b>, garantindo currículos, métodos, recursos e organização específicos para atender às suas necessidades."
+            }
+        ];
+
+        let currentIndex = 0;
+        const cardElement = document.getElementById('flashcard');
+        const categoryElement = document.getElementById('card-category');
+        const frontElement = document.getElementById('card-front');
+        const backElement = document.getElementById('card-back');
+        const trackerElement = document.getElementById('card-tracker');
+        const imageFrontElement = document.getElementById('card-image-front');
+        const imageBackElement = document.getElementById('card-image-back');
+
+        function updateCard() {
+            cardElement.classList.remove('is-flipped');
+            setTimeout(() => {
+                const currentData = cardsData[currentIndex];
+                categoryElement.innerText = currentData.category;
+                
+                // Atualização das Imagens
+                imageFrontElement.src = currentData.imageFront;
+                imageFrontElement.alt = `Imagem Frontal do card ${currentIndex + 1}`;
+                
+                imageBackElement.src = currentData.imageBack;
+                imageBackElement.alt = `Imagem Traseira do card ${currentIndex + 1}`;
+                
+                frontElement.innerHTML = currentData.front;
+                backElement.innerHTML = currentData.back;
+                trackerElement.innerText = `Card ${currentIndex + 1} de ${cardsData.length}`;
+            }, 150);
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('is-flipped');
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % cardsData.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + cardsData.length) % cardsData.length;
+            updateCard();
+        }
+
+        // Inicializar
+        updateCard();
+
+        // Suporte a teclas do teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextCard();
+            if (e.key === 'ArrowLeft') prevCard();
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+    </script>
+</body>
+</html>
