@@ -61,7 +61,7 @@
         .scene {
             width: 100%;
             max-width: 600px;
-            height: 380px;
+            height: 480px;
             perspective: 1000px;
             margin-bottom: 25px;
             cursor: pointer;
@@ -77,6 +77,9 @@
             box-shadow: var(--shadow);
         }
 
+        .card-content{
+        overflow-y: auto;
+        }
         .card.is-flipped {
             transform: rotateY(180deg);
         }
@@ -136,8 +139,8 @@
         }
 
         .card-image {
-            width: 100px;
-            height: 75px;
+            width: 220px;
+            height: 140px;
             object-fit: cover;
             border-radius: 8px;
             margin: 5px auto;
